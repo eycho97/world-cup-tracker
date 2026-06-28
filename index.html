@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>WC 2026 Draft · $125</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#f0f2f5;
+  --card:#fff;
+  --card-border:rgba(0,0,0,0.07);
+  --text:#111827;
+  --text-sub:#6b7280;
+  --text-muted:#9ca3af;
+  --divider:#f3f4f6;
+  --hdr:#0f172a;
+  --hdr-text:#f8fafc;
+  --hdr-sub:#94a3b8;
+  --phase-bg:#1e293b;
+  --tile-out:#f9fafb;
+  --tile-out-text:#9ca3af;
+  --warn-bg:#fef3c7;
+  --warn-border:#f59e0b;
+  --warn-text:#92400e;
+  --gold-bg:#fef3c7;--gold-text:#92400e;
+  --silver-bg:#e5e7eb;--silver-text:#374151;
+  --default-badge-bg:#f1f5f9;--default-badge-text:#64748b;
+}
+@media(prefers-color-scheme:dark){
+  :root{
+    --bg:#0f172a;--card:#1e293b;--card-border:rgba(255,255,255,0.07);
+    --text:#f1f5f9;--text-sub:#94a3b8;--text-muted:#64748b;
+    --divider:#334155;--hdr:#020617;--hdr-text:#f1f5f9;--hdr-sub:#64748b;
+    --phase-bg:#0f172a;--tile-out:#172033;--tile-out-text:#475569;
+    --warn-bg:#451a03;--warn-border:#d97706;--warn-text:#fde68a;
+    --gold-bg:#451a03;--gold-text:#fcd34d;
+    --silver-bg:#1f2937;--silver-text:#9ca3af;
+    --default-badge-bg:#1f2937;--default-badge-text:#64748b;
+  }
+}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;font-size:15px;line-height:1.5}
+.page-hdr{background:var(--hdr);color:var(--hdr-text);padding:20px 16px 18px;text-align:center}
+.page-title{font-size:1.25rem;font-weight:700;letter-spacing:-0.02em}
+.page-meta{margin-top:10px;display:flex;flex-wrap:wrap;gap:8px;justify-content:center;align-items:center;font-size:0.78rem;color:var(--hdr-sub)}
+.phase-badge{background:var(--phase-bg);color:var(--hdr-sub);padding:4px 12px;border-radius:999px;font-size:0.72rem;font-weight:500;border:1px solid rgba(255,255,255,0.07)}
+#last-updated{font-size:0.72rem}
+.board{max-width:700px;margin:0 auto;padding:16px;display:flex;flex-direction:column;gap:14px}
+.owner-card{background:var(--card);border-radius:12px;border:0.5px solid var(--card-border);overflow:hidden}
+.card-hdr{padding:13px 16px;display:flex;align-items:center;gap:10px;border-bottom:0.5px solid var(--divider)}
+.rank-badge{width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:0.8rem;font-weight:700;flex-shrink:0}
+.rk1{background:var(--gold-bg);color:var(--gold-text)}
+.rk2{background:var(--silver-bg);color:var(--silver-text)}
+.rkn{background:var(--default-badge-bg);color:var(--default-badge-text)}
+.owner-name{flex:1;font-weight:600;font-size:0.95rem}
+.owner-total{font-size:1.35rem;font-weight:700;color:var(--text);white-space:nowrap}
+.owner-total span{font-size:0.68rem;font-weight:400;color:var(--text-sub);margin-left:2px}
+.tiles-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:0.5px;background:var(--divider)}
+details.tile{background:var(--card);padding:10px 12px 9px;cursor:pointer;position:relative;user-select:none}
+details.tile summary{list-style:none;outline:none}
+details.tile summary::-webkit-details-marker{display:none}
+details.tile[open]{background:var(--divider)}
+.tile-top{display:flex;align-items:flex-start;justify-content:space-between;gap:4px;margin-bottom:5px}
+.tile-name{font-size:0.82rem;font-weight:600;color:var(--text);line-height:1.25;flex:1;word-break:break-word}
+.tile-footer{display:flex;align-items:center;justify-content:space-between;gap:4px}
+.tile-stage{font-size:0.7rem;font-weight:500;color:var(--text-sub)}
+.tile-pts{font-size:0.88rem;font-weight:700;color:var(--text)}
+details.tile.out{background:var(--tile-out)}
+details.tile.out[open]{background:var(--tile-out)}
+details.tile.out .tile-name,.tile-out .tile-stage,.tile-out .tile-pts{color:var(--tile-out-text)}
+details.tile.out .tile-name{color:var(--tile-out-text)}
+details.tile.out .tile-pts{color:var(--text-muted)}
+.star{font-size:0.6rem;vertical-align:1px;margin-left:2px;color:#d97706}
+.warn-flag{font-size:0.65rem;vertical-align:1px;margin-left:3px;color:var(--warn-border);cursor:help}
+.chevron{font-size:0.65rem;color:var(--text-muted);line-height:1;transition:transform 0.15s;flex-shrink:0;margin-top:1px}
+details.tile[open] .chevron{transform:rotate(90deg)}
+.tile-trail{padding:8px 0 2px;border-top:0.5px solid var(--divider);margin-top:7px;font-size:0.68rem;color:var(--text-sub)}
+.trail-row{display:flex;justify-content:space-between;gap:8px;padding:2px 0}
+.trail-plus{color:#059669;font-weight:600}
+.trail-nil{color:var(--text-muted)}
+.trail-total{display:flex;justify-content:space-between;margin-top:5px;padding-top:5px;border-top:0.5px dashed var(--divider);font-size:0.7rem;font-weight:700;color:var(--text)}
+.mismatch-banner{background:var(--warn-bg);border:0.5px solid var(--warn-border);border-radius:10px;padding:10px 14px;font-size:0.75rem;color:var(--warn-text);line-height:1.5;margin-bottom:2px}
+.mismatch-banner strong{font-weight:700}
+.loading{text-align:center;color:var(--text-sub);padding:48px 16px;font-size:0.9rem}
+</style>
+</head>
+<body>
+<header class="page-hdr">
+  <div class="page-title">⚽ WC 2026 Draft · $125 Board</div>
+  <div class="page-meta">
+    <span class="phase-badge" id="phase-badge">Loading…</span>
+    <span id="last-updated"></span>
+  </div>
+</header>
+<main class="board" id="board">
+  <div class="loading">Loading board…</div>
+</main>
+<script>
+const KO_PTS={GROUP:0,R32:0,R16:2,QF:5,SF:9,FINAL:14,CHAMPION:20};
+const STAGE_RANK={GROUP:0,R32:1,R16:2,QF:3,SF:4,FINAL:5,CHAMPION:6};
+
+function scoreTeam({won_group,furthest_stage}){
+  const adv=furthest_stage!=='GROUP';
+  const g=won_group?2:adv?1:0;
+  return g+(KO_PTS[furthest_stage]||0);
+}
+
+function roundLabel(won_group,fs){
+  if(fs==='GROUP')      return 'Out';
+  if(fs==='R32')        return won_group?'Group winner':'Advanced';
+  if(fs==='R16')        return 'Round of 16';
+  if(fs==='QF')         return 'Quarter-final';
+  if(fs==='SF')         return 'Semi-final';
+  if(fs==='FINAL')      return 'Runner-up';
+  if(fs==='CHAMPION')   return 'Champion';
+  return fs;
+}
+
+function stageLabelColor(fs){
+  if(fs==='GROUP')      return'#9ca3af';
+  if(fs==='R32')        return'#6b7280';
+  if(fs==='R16')        return'#2563eb';
+  if(fs==='QF')         return'#7c3aed';
+  if(fs==='SF')         return'#059669';
+  if(fs==='FINAL')      return'#dc2626';
+  if(fs==='CHAMPION')   return'#d97706';
+  return'#6b7280';
+}
+
+function buildTrail(won_group,fs){
+  const rank=STAGE_RANK[fs]||0;
+  const rows=[];
+  if(rank===0){rows.push({label:'Eliminated in group stage',pts:0});return rows;}
+  rows.push(won_group
+    ?{label:'Won group',pts:2}
+    :{label:'Advanced (runner-up / best 3rd)',pts:1});
+  if(rank>=2)rows.push({label:'Won R32 → Round of 16',pts:2});
+  if(rank>=3)rows.push({label:'Won R16 → Quarter-final',pts:3});
+  if(rank>=4)rows.push({label:'Won QF → Semi-final',pts:4});
+  if(rank>=5)rows.push({label:'Won SF → Final',pts:5});
+  if(rank>=6)rows.push({label:'Won Final',pts:6});
+  return rows;
+}
+
+function phaseLabel(teams){
+  let max=0;
+  for(const t of Object.values(teams)){
+    const r=STAGE_RANK[t.furthest_stage]||0;
+    if(r>max)max=r;
+  }
+  return['Group stage in progress','Group stage final · Round of 32 in progress','Round of 32 complete · Round of 16 in progress','Round of 16 complete · Quarter-finals in progress','Quarter-finals complete · Semi-finals in progress','Semi-finals complete · Final in progress','Tournament complete'][max]||'Group stage in progress';
+}
+
+function parseMismatchIds(warnings){
+  const ids=new Set();
+  for(const w of(warnings||[])){
+    const m=w.match(/team (\d+)/);
+    if(m)ids.add(m[1]);
+  }
+  return ids;
+}
+
+function computeRanks(totals){
+  const entries=[...totals.entries()].sort((a,b)=>b[1]-a[1]);
+  const map={};
+  let i=0;
+  while(i<entries.length){
+    const pts=entries[i][1];
+    let j=i;
+    while(j<entries.length&&entries[j][1]===pts)j++;
+    const rank=i+1;
+    for(let k=i;k<j;k++)map[entries[k][0]]=rank;
+    i=j;
+  }
+  return map;
+}
+
+function rankClass(rank){
+  if(rank===1)return'rk1';
+  if(rank===2)return'rk2';
+  return'rkn';
+}
+
+function fmtDate(iso){
+  try{
+    return new Date(iso).toLocaleString('en-US',{month:'short',day:'numeric',hour:'numeric',minute:'2-digit',timeZoneName:'short'});
+  }catch{return iso;}
+}
+
+function esc(s){
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+async function render(){
+  const board=document.getElementById('board');
+  try{
+    const [td,rd,od]=await Promise.all([
+      fetch('teams.json').then(r=>r.json()),
+      fetch('results.json').then(r=>r.json()),
+      fetch('overrides.json').then(r=>r.json()).catch(()=>({teams:{}})),
+    ]);
+
+    const teamRes={...rd.teams};
+    for(const[id,ov]of Object.entries(od.teams||{})){
+      teamRes[id]={...(teamRes[id]||{}),...ov};
+    }
+
+    const mismatchIds=parseMismatchIds(rd._warnings);
+
+    const ownerPicks=new Map();
+    for(const pick of td.teams){
+      if(!ownerPicks.has(pick.owner))ownerPicks.set(pick.owner,[]);
+      ownerPicks.get(pick.owner).push(pick);
+    }
+
+    const ownerTotals=new Map();
+    for(const[owner,picks]of ownerPicks){
+      let total=0;
+      for(const p of picks){
+        const t=teamRes[String(p.team_id)]||{won_group:false,furthest_stage:'GROUP'};
+        total+=scoreTeam(t);
+      }
+      ownerTotals.set(owner,total);
+    }
+
+    const sortedOwners=[...ownerPicks.keys()].sort((a,b)=>{
+      const d=ownerTotals.get(b)-ownerTotals.get(a);
+      return d!==0?d:a.localeCompare(b);
+    });
+
+    const ranks=computeRanks(ownerTotals);
+
+    document.getElementById('phase-badge').textContent=phaseLabel(teamRes);
+    if(rd.last_updated){
+      document.getElementById('last-updated').textContent='Updated '+fmtDate(rd.last_updated);
+    }
+
+    const hasMismatch=mismatchIds.size>0;
+    let html='';
+
+    if(hasMismatch){
+      html+=`<div class="mismatch-banner"><strong>⚠ Standings / bracket mismatch</strong> — one or more teams' advancement couldn't be confirmed from both data sources. Affected tiles are marked ⚠ and need manual review before the next update.</div>`;
+    }
+
+    for(const owner of sortedOwners){
+      const total=ownerTotals.get(owner);
+      const rank=ranks[owner];
+      const picks=ownerPicks.get(owner);
+      const rc=rankClass(rank);
+
+      let tilesHtml='';
+      for(const pick of picks){
+        const tid=String(pick.team_id);
+        const t=teamRes[tid]||{won_group:false,furthest_stage:'GROUP'};
+        const pts=scoreTeam(t);
+        const isOut=t.furthest_stage==='GROUP';
+        const label=roundLabel(t.won_group,t.furthest_stage);
+        const labelColor=isOut?'':stageLabelColor(t.furthest_stage);
+        const isMismatch=mismatchIds.has(tid);
+        const trail=buildTrail(t.won_group,t.furthest_stage);
+
+        const trailRows=trail.map(row=>
+          row.pts>0
+            ?`<div class="trail-row"><span>${esc(row.label)}</span><span class="trail-plus">+${row.pts}</span></div>`
+            :`<div class="trail-row"><span>${esc(row.label)}</span><span class="trail-nil">—</span></div>`
+        ).join('');
+
+        const starHtml=t.won_group&&!isOut?`<span class="star" aria-label="Group winner">★</span>`:'';
+        const warnHtml=isMismatch?`<span class="warn-flag" title="Standings vs bracket mismatch — confirm manually">⚠</span>`:'';
+
+        tilesHtml+=`<details class="tile${isOut?' out':''}">
+<summary>
+<div class="tile-top">
+<div class="tile-name">${esc(pick.name)}${starHtml}${warnHtml}</div>
+<span class="chevron">›</span>
+</div>
+<div class="tile-footer">
+<span class="tile-stage"${labelColor?` style="color:${labelColor}"`:''}>${esc(label)}</span>
+<span class="tile-pts"${isOut?' style="color:var(--tile-out-text)"':''}>${pts}</span>
+</div>
+</summary>
+<div class="tile-trail">
+${trailRows}
+<div class="trail-total"><span>Total</span><span>${pts} pt${pts!==1?'s':'s'}</span></div>
+</div>
+</details>`;
+      }
+
+      html+=`<div class="owner-card">
+<div class="card-hdr">
+<div class="rank-badge ${rc}">${rank}</div>
+<div class="owner-name">${esc(owner)}</div>
+<div class="owner-total">${total}<span>pts</span></div>
+</div>
+<div class="tiles-grid">${tilesHtml}</div>
+</div>`;
+    }
+
+    board.innerHTML=html;
+  }catch(e){
+    board.innerHTML=`<div class="loading">Error: ${esc(e.message)}</div>`;
+    console.error(e);
+  }
+}
+
+render();
+</script>
+</body>
+</html>
