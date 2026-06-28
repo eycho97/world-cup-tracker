@@ -1,197 +1,246 @@
 {
-  "last_updated": "2026-06-28T15:34:24.388Z",
+  "last_updated": "2026-06-28T16:42:54.804Z",
   "teams": {
     "758": {
       "won_group": false,
-      "furthest_stage": "GROUP"
+      "furthest_stage": "GROUP",
+      "eliminated": true
     },
     "759": {
       "won_group": true,
-      "furthest_stage": "R32"
+      "furthest_stage": "R32",
+      "eliminated": false
     },
     "760": {
       "won_group": true,
-      "furthest_stage": "R32"
+      "furthest_stage": "R32",
+      "eliminated": false
     },
     "761": {
       "won_group": false,
-      "furthest_stage": "R32"
+      "furthest_stage": "R32",
+      "eliminated": false
     },
     "762": {
       "won_group": true,
-      "furthest_stage": "R32"
+      "furthest_stage": "R32",
+      "eliminated": false
     },
     "763": {
       "won_group": false,
-      "furthest_stage": "R32"
+      "furthest_stage": "R32",
+      "eliminated": false
     },
     "764": {
       "won_group": true,
-      "furthest_stage": "R32"
+      "furthest_stage": "R32",
+      "eliminated": false
     },
     "765": {
       "won_group": false,
-      "furthest_stage": "R32"
+      "furthest_stage": "R32",
+      "eliminated": false
     },
     "766": {
       "won_group": false,
-      "furthest_stage": "R32"
+      "furthest_stage": "R32",
+      "eliminated": false
     },
     "769": {
       "won_group": true,
-      "furthest_stage": "R32"
+      "furthest_stage": "R32",
+      "eliminated": false
     },
     "770": {
       "won_group": true,
-      "furthest_stage": "R32"
+      "furthest_stage": "R32",
+      "eliminated": false
     },
     "771": {
       "won_group": true,
-      "furthest_stage": "R32"
+      "furthest_stage": "R32",
+      "eliminated": false
     },
     "772": {
       "won_group": false,
-      "furthest_stage": "GROUP"
+      "furthest_stage": "GROUP",
+      "eliminated": true
     },
     "773": {
       "won_group": true,
-      "furthest_stage": "R32"
+      "furthest_stage": "R32",
+      "eliminated": false
     },
     "774": {
       "won_group": false,
-      "furthest_stage": "R32"
+      "furthest_stage": "R32",
+      "eliminated": false
     },
     "778": {
       "won_group": false,
-      "furthest_stage": "R32"
+      "furthest_stage": "R32",
+      "eliminated": false
     },
     "779": {
       "won_group": false,
-      "furthest_stage": "R32"
+      "furthest_stage": "R32",
+      "eliminated": false
     },
     "783": {
       "won_group": false,
-      "furthest_stage": "GROUP"
+      "furthest_stage": "GROUP",
+      "eliminated": true
     },
     "788": {
       "won_group": true,
-      "furthest_stage": "R32"
+      "furthest_stage": "R32",
+      "eliminated": false
     },
     "791": {
       "won_group": false,
-      "furthest_stage": "R32"
+      "furthest_stage": "R32",
+      "eliminated": false
     },
     "792": {
       "won_group": false,
-      "furthest_stage": "R32"
+      "furthest_stage": "R32",
+      "eliminated": false
     },
     "798": {
       "won_group": false,
-      "furthest_stage": "GROUP"
+      "furthest_stage": "GROUP",
+      "eliminated": true
     },
     "799": {
       "won_group": false,
-      "furthest_stage": "R32"
+      "furthest_stage": "R32",
+      "eliminated": false
     },
     "801": {
       "won_group": false,
-      "furthest_stage": "GROUP"
+      "furthest_stage": "GROUP",
+      "eliminated": true
     },
     "802": {
       "won_group": false,
-      "furthest_stage": "GROUP"
+      "furthest_stage": "GROUP",
+      "eliminated": true
     },
     "803": {
       "won_group": false,
-      "furthest_stage": "GROUP"
+      "furthest_stage": "GROUP",
+      "eliminated": true
     },
     "804": {
       "won_group": false,
-      "furthest_stage": "R32"
+      "furthest_stage": "R32",
+      "eliminated": false
     },
     "805": {
       "won_group": true,
-      "furthest_stage": "R32"
+      "furthest_stage": "R32",
+      "eliminated": false
     },
     "815": {
       "won_group": false,
-      "furthest_stage": "R32"
+      "furthest_stage": "R32",
+      "eliminated": false
     },
     "816": {
       "won_group": false,
-      "furthest_stage": "R32"
+      "furthest_stage": "R32",
+      "eliminated": false
     },
     "818": {
       "won_group": true,
-      "furthest_stage": "R32"
+      "furthest_stage": "R32",
+      "eliminated": false
     },
     "825": {
       "won_group": false,
-      "furthest_stage": "R32"
+      "furthest_stage": "R32",
+      "eliminated": false
     },
     "828": {
       "won_group": false,
-      "furthest_stage": "R32"
+      "furthest_stage": "R32",
+      "eliminated": false
     },
     "836": {
       "won_group": false,
-      "furthest_stage": "GROUP"
+      "furthest_stage": "GROUP",
+      "eliminated": true
     },
     "840": {
       "won_group": false,
-      "furthest_stage": "GROUP"
+      "furthest_stage": "GROUP",
+      "eliminated": true
     },
     "1060": {
       "won_group": false,
-      "furthest_stage": "R32"
+      "furthest_stage": "R32",
+      "eliminated": false
     },
     "1836": {
       "won_group": false,
-      "furthest_stage": "GROUP"
+      "furthest_stage": "GROUP",
+      "eliminated": true
     },
     "1930": {
       "won_group": false,
-      "furthest_stage": "R32"
+      "furthest_stage": "R32",
+      "eliminated": false
     },
     "1934": {
       "won_group": false,
-      "furthest_stage": "R32"
+      "furthest_stage": "R32",
+      "eliminated": false
     },
     "1935": {
       "won_group": false,
-      "furthest_stage": "R32"
+      "furthest_stage": "R32",
+      "eliminated": false
     },
     "8030": {
       "won_group": false,
-      "furthest_stage": "GROUP"
+      "furthest_stage": "GROUP",
+      "eliminated": true
     },
     "8049": {
       "won_group": false,
-      "furthest_stage": "GROUP"
+      "furthest_stage": "GROUP",
+      "eliminated": true
     },
     "8062": {
       "won_group": false,
-      "furthest_stage": "GROUP"
+      "furthest_stage": "GROUP",
+      "eliminated": true
     },
     "8070": {
       "won_group": false,
-      "furthest_stage": "GROUP"
+      "furthest_stage": "GROUP",
+      "eliminated": true
     },
     "8601": {
       "won_group": true,
-      "furthest_stage": "R32"
+      "furthest_stage": "R32",
+      "eliminated": false
     },
     "8872": {
       "won_group": false,
-      "furthest_stage": "R32"
+      "furthest_stage": "R32",
+      "eliminated": false
     },
     "8873": {
       "won_group": false,
-      "furthest_stage": "GROUP"
+      "furthest_stage": "GROUP",
+      "eliminated": true
     },
     "9460": {
       "won_group": false,
-      "furthest_stage": "GROUP"
+      "furthest_stage": "GROUP",
+      "eliminated": true
     }
-  }
+  },
+  "phase": "Group stage final · Round of 32 in progress"
 }
