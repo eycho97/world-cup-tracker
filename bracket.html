@@ -362,8 +362,7 @@ function renderLegend(teamsData, resultsData){
     btnTree.onclick=showTree;
     btnTabs.onclick=showTabs;
 
-    // Default by viewport
-    if(window.innerWidth<768) showTabs(); else showTree();
+    showTree();
 
   }catch(e){
     const msg=`<div class="loading">Error loading bracket: ${esc(e.message)}</div>`;
