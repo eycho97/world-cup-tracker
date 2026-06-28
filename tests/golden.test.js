@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 'use strict';
 const assert = require('assert');
-const { scoreTeam, KNOCKOUT_POINTS } = require('../logic/score.js');
+const { scoreTeam, KNOCKOUT_POINTS, buildTrail } = require('../logic/score.js');
 const { derive } = require('../logic/derive.js');
 
 let passed = 0, failed = 0;
@@ -140,24 +140,24 @@ test('groups complete + bracket EMPTY → all advancers credited from standings'
   const r = derive(FULL_STANDINGS, []); // no matches at all
 
   for (const id of GW_IDS) {
-    assert.deepStrictEqual(r.teams[String(id)], { won_group: true,  furthest_stage: 'R32' },
-      `group winner ${id} should be R32`);
+    assert.deepStrictEqual(r.teams[String(id)], { won_group: true,  furthest_stage: 'R32', eliminated: false },
+      `group winner ${id} should be R32, not eliminated`);
   }
   for (const id of RU_IDS) {
-    assert.deepStrictEqual(r.teams[String(id)], { won_group: false, furthest_stage: 'R32' },
-      `runner-up ${id} should be R32`);
+    assert.deepStrictEqual(r.teams[String(id)], { won_group: false, furthest_stage: 'R32', eliminated: false },
+      `runner-up ${id} should be R32, not eliminated`);
   }
   for (const id of P3_ADV) {
-    assert.deepStrictEqual(r.teams[String(id)], { won_group: false, furthest_stage: 'R32' },
-      `best-3rd ${id} should be R32`);
+    assert.deepStrictEqual(r.teams[String(id)], { won_group: false, furthest_stage: 'R32', eliminated: false },
+      `best-3rd ${id} should be R32, not eliminated`);
   }
   for (const id of P3_OUT) {
-    assert.deepStrictEqual(r.teams[String(id)], { won_group: false, furthest_stage: 'GROUP' },
-      `non-qualifying 3rd ${id} should be GROUP`);
+    assert.deepStrictEqual(r.teams[String(id)], { won_group: false, furthest_stage: 'GROUP', eliminated: true },
+      `non-qualifying 3rd ${id} should be GROUP, eliminated`);
   }
   for (const id of P4_IDS) {
-    assert.deepStrictEqual(r.teams[String(id)], { won_group: false, furthest_stage: 'GROUP' },
-      `4th-place ${id} should be GROUP`);
+    assert.deepStrictEqual(r.teams[String(id)], { won_group: false, furthest_stage: 'GROUP', eliminated: true },
+      `4th-place ${id} should be GROUP, eliminated`);
   }
   // Exactly 32 teams advanced (12 GW + 12 RU + 8 best-3rd)
   const advCount = Object.values(r.teams).filter(v => v.furthest_stage !== 'GROUP').length;
@@ -168,7 +168,7 @@ test('groups complete + bracket EMPTY → all advancers credited from standings'
 test('best-3rd ranked 8th advances even with no bracket slot filled', () => {
   const rank8Id = mkGroupId(7, 3); // Group H, 3pts GD=+1 GF=4 — 8th of 12
   const r = derive(FULL_STANDINGS, []);
-  assert.deepStrictEqual(r.teams[String(rank8Id)], { won_group: false, furthest_stage: 'R32' });
+  assert.deepStrictEqual(r.teams[String(rank8Id)], { won_group: false, furthest_stage: 'R32', eliminated: false });
   assert.strictEqual(scoreTeam(r.teams[String(rank8Id)]), 1);
 });
 
@@ -176,7 +176,7 @@ test('best-3rd ranked 8th advances even with no bracket slot filled', () => {
 test('9th-ranked 3rd-place team does NOT advance → GROUP, 0 pts', () => {
   const rank9Id = mkGroupId(8, 3); // Group I, 3pts GD=0 GF=3 — 9th of 12
   const r = derive(FULL_STANDINGS, []);
-  assert.deepStrictEqual(r.teams[String(rank9Id)], { won_group: false, furthest_stage: 'GROUP' });
+  assert.deepStrictEqual(r.teams[String(rank9Id)], { won_group: false, furthest_stage: 'GROUP', eliminated: true });
   assert.strictEqual(scoreTeam(r.teams[String(rank9Id)]), 0);
 });
 
@@ -227,10 +227,10 @@ test('penalty-shootout: score.winner=HOME_TEAM promotes home team', () => {
   const matches   = [mkMatch('LAST_32', 'FINISHED', 'H', GW, P3, 'PENALTY_SHOOTOUT')];
   const r         = derive(standings, matches);
 
-  // GW won LAST_32 → promoted to R16
-  assert.deepStrictEqual(r.teams[String(GW)], { won_group: true,  furthest_stage: 'R16' });
-  // P3 is advanced from standings (only 3rd-place in 1 group), lost R32 → stays R32
-  assert.deepStrictEqual(r.teams[String(P3)], { won_group: false, furthest_stage: 'R32' });
+  // GW won LAST_32 → promoted to R16, still alive
+  assert.deepStrictEqual(r.teams[String(GW)], { won_group: true,  furthest_stage: 'R16', eliminated: false });
+  // P3 advanced from standings, lost R32 → stays R32, eliminated
+  assert.deepStrictEqual(r.teams[String(P3)], { won_group: false, furthest_stage: 'R32', eliminated: true });
   assert.strictEqual(scoreTeam(r.teams[String(P3)]), 1);
 });
 
@@ -259,7 +259,7 @@ test('group winner lost R32 → furthest_stage=R32, score=2 (not 3)', () => {
   const matches   = [mkMatch('LAST_32', 'FINISHED', 'A', GW, OPP)]; // OPP away wins
   const r         = derive(standings, matches);
 
-  assert.deepStrictEqual(r.teams[String(GW)], { won_group: true, furthest_stage: 'R32' });
+  assert.deepStrictEqual(r.teams[String(GW)], { won_group: true, furthest_stage: 'R32', eliminated: true });
   assert.strictEqual(scoreTeam(r.teams[String(GW)]), 2); // 2 (group) + 0 (KO) = 2
 });
 
@@ -305,10 +305,10 @@ test('advanced teams start at R32 even with zero matches', () => {
   // All of GW, R2, P3 are advanced from standings; OUT is not.
   const r = derive(mkStandings(GW, R2, P3, OUT), []);
 
-  assert.deepStrictEqual(r.teams[String(GW)],  { won_group: true,  furthest_stage: 'R32' });
-  assert.deepStrictEqual(r.teams[String(R2)],  { won_group: false, furthest_stage: 'R32' });
-  assert.deepStrictEqual(r.teams[String(P3)],  { won_group: false, furthest_stage: 'R32' });
-  assert.deepStrictEqual(r.teams[String(OUT)], { won_group: false, furthest_stage: 'GROUP' });
+  assert.deepStrictEqual(r.teams[String(GW)],  { won_group: true,  furthest_stage: 'R32',   eliminated: false });
+  assert.deepStrictEqual(r.teams[String(R2)],  { won_group: false, furthest_stage: 'R32',   eliminated: false });
+  assert.deepStrictEqual(r.teams[String(P3)],  { won_group: false, furthest_stage: 'R32',   eliminated: false });
+  assert.deepStrictEqual(r.teams[String(OUT)], { won_group: false, furthest_stage: 'GROUP', eliminated: true  });
   assert.strictEqual(scoreTeam(r.teams[String(GW)]),  2); // group winner in R32
   assert.strictEqual(scoreTeam(r.teams[String(R2)]),  1);
   assert.strictEqual(scoreTeam(r.teams[String(P3)]),  1);
@@ -343,7 +343,7 @@ test('full champion path: won every round', () => {
   ];
   const r = derive(standings, matches);
 
-  assert.deepStrictEqual(r.teams[String(GW)], { won_group: true, furthest_stage: 'CHAMPION' });
+  assert.deepStrictEqual(r.teams[String(GW)], { won_group: true, furthest_stage: 'CHAMPION', eliminated: false });
   assert.strictEqual(scoreTeam(r.teams[String(GW)]), 22);
 });
 
@@ -435,6 +435,101 @@ test('hypothetical leaderboard — ranking order ED CHO > PAT > IMAN > DYL > WIL
     totals[owner] = (totals[owner] || 0) + scoreTeam({ won_group, furthest_stage });
   const ranked = Object.entries(totals).sort(([,a],[,b]) => b-a).map(([o]) => o);
   assert.deepStrictEqual(ranked, ['ED CHO','PAT (JR)','IMAN IS #1','DYL PICKLE','WILL (DAD)']);
+});
+
+// ---------------------------------------------------------------------------
+// SECTION 6 — New contract: eliminated, _mismatches, trail-sum assertion
+// ---------------------------------------------------------------------------
+console.log('\nSECTION 6 — eliminated · _mismatches · trail sum');
+
+// 6a. eliminated: KO winner is NOT eliminated; loser IS.
+test('KO winner eliminated=false; loser eliminated=true', () => {
+  const standings = mkStandings(GW, R2, P3, OUT);
+  const matches   = [mkMatch('LAST_32', 'FINISHED', 'H', GW, R2)];  // GW wins, R2 loses
+  const r         = derive(standings, matches);
+
+  assert.strictEqual(r.teams[String(GW)].eliminated, false, 'KO winner must not be eliminated');
+  assert.strictEqual(r.teams[String(R2)].eliminated, true,  'KO loser must be eliminated');
+});
+
+// 6b. eliminated: CHAMPION is never eliminated.
+test('CHAMPION eliminated=false', () => {
+  const standings = mkStandings(GW, R2, P3, OUT);
+  const matches   = [
+    mkMatch('LAST_32',        'FINISHED', 'H', GW, OPP),
+    mkMatch('LAST_16',        'FINISHED', 'H', GW, OPP),
+    mkMatch('QUARTER_FINALS', 'FINISHED', 'H', GW, OPP),
+    mkMatch('SEMI_FINALS',    'FINISHED', 'H', GW, OPP),
+    mkMatch('FINAL',          'FINISHED', 'H', GW, OPP),
+  ];
+  const r = derive(standings, matches);
+  assert.strictEqual(r.teams[String(GW)].furthest_stage, 'CHAMPION');
+  assert.strictEqual(r.teams[String(GW)].eliminated, false);
+});
+
+// 6c. eliminated: GROUP-stage non-advancers are eliminated; zero KO matches needed.
+test('non-advanced teams eliminated=true even with no KO matches', () => {
+  const r = derive(mkStandings(GW, R2, P3, OUT), []);
+  assert.strictEqual(r.teams[String(OUT)].eliminated, true, '4th place must be eliminated');
+  // Advanced teams: not eliminated (no KO loss on record)
+  assert.strictEqual(r.teams[String(GW)].eliminated,  false, 'group winner awaiting KO must not be eliminated');
+  assert.strictEqual(r.teams[String(R2)].eliminated,  false, 'runner-up awaiting KO must not be eliminated');
+});
+
+// 6d. _mismatches is a structured array of strings, not prose — and _warnings is gone.
+test('_mismatches is array of id strings; _warnings removed', () => {
+  // Build a scenario where inR32.size === 32 but one team in bracket isn't in standings.
+  // Easiest: use the single-group fixture (only 4 teams; inR32 won't hit 32 with real data).
+  // Instead, verify the OUTPUT SHAPE with the FULL_STANDINGS fixture (no mismatches expected).
+  const r = derive(FULL_STANDINGS, []);
+  assert.ok(!('_warnings' in r), '_warnings must not exist in derive output');
+  assert.ok(!('_mismatches' in r) || Array.isArray(r._mismatches),
+    '_mismatches, if present, must be an array');
+  if (r._mismatches) {
+    for (const id of r._mismatches) {
+      assert.strictEqual(typeof id, 'string', `each mismatch id must be a string, got: ${typeof id}`);
+    }
+  }
+});
+
+// 6e. Trail rows sum to scoreTeam() for all 14 scoring cases.
+test('buildTrail rows sum to scoreTeam() for every scoring case', () => {
+  const cases = [
+    { won_group: false, furthest_stage: 'GROUP' },
+    // {won_group:true, furthest_stage:'GROUP'} is impossible; scoreTeam and buildTrail agree on all reachable states
+    { won_group: false, furthest_stage: 'R32'   },
+    { won_group: true,  furthest_stage: 'R32'   },
+    { won_group: false, furthest_stage: 'R16'   },
+    { won_group: true,  furthest_stage: 'R16'   },
+    { won_group: false, furthest_stage: 'QF'    },
+    { won_group: true,  furthest_stage: 'QF'    },
+    { won_group: false, furthest_stage: 'SF'    },
+    { won_group: true,  furthest_stage: 'SF'    },
+    { won_group: false, furthest_stage: 'FINAL' },
+    { won_group: true,  furthest_stage: 'FINAL' },
+    { won_group: false, furthest_stage: 'CHAMPION' },
+    { won_group: true,  furthest_stage: 'CHAMPION' },
+  ];
+  for (const team of cases) {
+    const expected = scoreTeam(team);
+    const rows     = buildTrail(team);
+    const got      = rows.reduce((s, r) => s + r.pts, 0);
+    assert.strictEqual(got, expected,
+      `trail sum mismatch for ${JSON.stringify(team)}: rows sum to ${got}, scoreTeam = ${expected}`);
+  }
+});
+
+// 6f. No stale eliminated=true on a team that then WON a later match.
+//     (A team wins R32 then R16 — their final furthest_stage is QF, eliminated=false.)
+test('team that won multiple rounds: eliminated=false, furthest_stage=QF', () => {
+  const standings = mkStandings(GW, R2, P3, OUT);
+  const matches   = [
+    mkMatch('LAST_32', 'FINISHED', 'H', R2, OPP),
+    mkMatch('LAST_16', 'FINISHED', 'H', R2, OPP),
+  ];
+  const r = derive(standings, matches);
+  assert.strictEqual(r.teams[String(R2)].furthest_stage, 'QF');
+  assert.strictEqual(r.teams[String(R2)].eliminated, false, 'still alive after winning two rounds');
 });
 
 // ---------------------------------------------------------------------------

@@ -10,28 +10,32 @@ const PROMOTE = {
 
 const STAGE_RANK = { GROUP: 0, R32: 1, R16: 2, QF: 3, SF: 4, FINAL: 5, CHAMPION: 6 };
 
-// derive(standings, matches) → { last_updated, teams, _warnings? }
+// derive(standings, matches) → { last_updated, teams, _mismatches? }
 //
 // standings : the `standings` array from GET /v4/competitions/WC/standings
 // matches   : the `matches`   array from GET /v4/competitions/WC/matches
 //
-// Advancement sourced from FINAL GROUP STANDINGS — not from R32 bracket slots.
+// Per-team fields:
+//   won_group      — position 1 in each group table
+//   furthest_stage — starts at R32 for all advanced teams; raised by PROMOTE-ON-WIN
+//                    for each FINISHED KO match the team won
+//   eliminated     — true if the team lost a FINISHED group or KO match; false if still
+//                    alive (won latest match / awaiting next round) or CHAMPION.
+//                    Display-only; does not affect scoring.
+//
+// Top-level:
+//   _mismatches — array of team_id strings present when standings-derived advancers
+//                 disagree with bracket participants (only once inR32.size === 32).
+//
+// Advancement sourced from FINAL GROUP STANDINGS, not from R32 bracket slots.
 // Bracket slots lag; standings are authoritative the moment all games are played.
 //
-//   won_group    — position 1 in each group table
-//   advanced     — position 1 or 2 always; position 3 if ranked in the top 8 of all
-//                  third-place teams by: points desc, GD desc, GF desc
-//   furthest_stage — starts at R32 for all advanced teams, then raised by PROMOTE-ON-WIN
-//                    for each FINISHED KO match the team won
-//
 // Throws if there is an unresolvable tie at the 8th/9th third-place boundary.
-// Returns { _warnings } if standings-derived advancers disagree with a fully-populated
-// R32 bracket (inR32.size === 32); caller should treat this as an override candidate.
 function derive(standings, matches) {
   // ── Step 1: advancement from group standings ──────────────────────────────
-  const wonGroup  = new Set();
-  const advanced  = new Set();   // will hold all 32 advancing team ids
-  const thirdPlace = [];         // { id, points, goalDifference, goalsFor }
+  const wonGroup   = new Set();
+  const advanced   = new Set();   // all 32 advancing team ids
+  const thirdPlace = [];          // { id, points, goalDifference, goalsFor }
 
   for (const s of standings) {
     for (const row of s.table) {
@@ -49,18 +53,16 @@ function derive(standings, matches) {
           goalsFor:       row.goalsFor,
         });
       }
-      // position 4: not advanced
     }
   }
 
   // ── Step 2: rank 3rd-place teams; add top 8 ──────────────────────────────
   thirdPlace.sort((a, b) => {
-    if (b.points !== a.points)         return b.points - a.points;
-    if (b.goalDifference !== a.goalDifference) return b.goalDifference - a.goalDifference;
+    if (b.points !== a.points)                     return b.points - a.points;
+    if (b.goalDifference !== a.goalDifference)     return b.goalDifference - a.goalDifference;
     return b.goalsFor - a.goalsFor;
   });
 
-  // Flag an unresolvable tie at the critical 8th/9th boundary.
   if (thirdPlace.length >= 9) {
     const t8 = thirdPlace[7];
     const t9 = thirdPlace[8];
@@ -69,7 +71,7 @@ function derive(standings, matches) {
         t8.goalsFor === t9.goalsFor) {
       throw new Error(
         `STOP: tie at 8th/9th 3rd-place boundary ` +
-        `(pts=${t8.points}, GD=${t8.goalDifference > 0 ? '+' : ''}${t8.goalDifference}, GF=${t8.goalsFor}) — ` +
+        `(pts=${t8.points}, GD=${t8.goalDifference >= 0 ? '+' : ''}${t8.goalDifference}, GF=${t8.goalsFor}) — ` +
         `team ${t8.id} and team ${t9.id} are indistinguishable; add a manual override`
       );
     }
@@ -79,9 +81,10 @@ function derive(standings, matches) {
     advanced.add(t.id);
   }
 
-  // ── Step 3: scan matches for KO promotions + bracket cross-check ──────────
-  const inR32     = new Set();   // non-null team ids in LAST_32 fixtures
-  const winStage  = {};          // teamId → best stage reached via a FINISHED win
+  // ── Step 3: scan KO matches for promotions, losses, and bracket cross-check
+  const inR32    = new Set();   // non-null team ids appearing in LAST_32 fixtures
+  const winStage = {};          // teamId → best stage reached via a FINISHED win
+  const koLosers = new Set();   // team ids that lost a FINISHED main-bracket match
 
   for (const m of matches) {
     if (m.stage === 'LAST_32') {
@@ -93,25 +96,29 @@ function derive(standings, matches) {
     const promoted = PROMOTE[m.stage];
     if (!promoted) continue;   // GROUP_STAGE, THIRD_PLACE, …: skip
 
-    const w = m.score.winner === 'HOME_TEAM' ? m.homeTeam : m.awayTeam;
-    if (!w || w.id == null) continue;
+    const winner = m.score.winner === 'HOME_TEAM' ? m.homeTeam : m.awayTeam;
+    const loser  = m.score.winner === 'HOME_TEAM' ? m.awayTeam : m.homeTeam;
 
-    const id = w.id;
-    if (!winStage[id] || STAGE_RANK[promoted] > STAGE_RANK[winStage[id]]) {
-      winStage[id] = promoted;
+    if (winner && winner.id != null) {
+      const id = winner.id;
+      if (!winStage[id] || STAGE_RANK[promoted] > STAGE_RANK[winStage[id]]) {
+        winStage[id] = promoted;
+      }
+    }
+
+    if (loser && loser.id != null) {
+      koLosers.add(loser.id);
     }
   }
 
   // ── Step 4: cross-check once bracket is fully populated (32 non-null slots)
-  const warnings = [];
+  const mismatches = [];
   if (inR32.size === 32) {
     for (const id of inR32) {
-      if (!advanced.has(id))
-        warnings.push(`BRACKET_MISMATCH: team ${id} in R32 bracket but not in standings-derived advancers — review for override`);
+      if (!advanced.has(id)) mismatches.push(String(id));
     }
     for (const id of advanced) {
-      if (!inR32.has(id))
-        warnings.push(`BRACKET_MISMATCH: team ${id} in standings-derived advancers but missing from R32 bracket — review for override`);
+      if (!inR32.has(id)) mismatches.push(String(id));
     }
   }
 
@@ -122,13 +129,14 @@ function derive(standings, matches) {
       const id = row.team.id;
 
       let furthest_stage;
-      if      (winStage[id])   furthest_stage = winStage[id];
+      if      (winStage[id])     furthest_stage = winStage[id];
       else if (advanced.has(id)) furthest_stage = 'R32';
       else                       furthest_stage = 'GROUP';
 
       teams[String(id)] = {
-        won_group: wonGroup.has(id),
+        won_group:      wonGroup.has(id),
         furthest_stage,
+        eliminated:     furthest_stage === 'GROUP' || koLosers.has(id),
       };
     }
   }
@@ -136,7 +144,7 @@ function derive(standings, matches) {
   return {
     last_updated: new Date().toISOString(),
     teams,
-    ...(warnings.length > 0 && { _warnings: warnings }),
+    ...(mismatches.length > 0 && { _mismatches: mismatches }),
   };
 }
 

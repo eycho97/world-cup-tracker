@@ -56,7 +56,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .owner-total{font-size:1.35rem;font-weight:700;color:var(--text);white-space:nowrap}
 .owner-total span{font-size:0.68rem;font-weight:400;color:var(--text-sub);margin-left:2px}
 .tiles-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:0.5px;background:var(--divider)}
-details.tile{background:var(--card);padding:10px 12px 9px;cursor:pointer;position:relative;user-select:none}
+details.tile{background:var(--card);padding:10px 12px 9px;cursor:pointer;user-select:none}
 details.tile summary{list-style:none;outline:none}
 details.tile summary::-webkit-details-marker{display:none}
 details.tile[open]{background:var(--divider)}
@@ -67,8 +67,8 @@ details.tile[open]{background:var(--divider)}
 .tile-pts{font-size:0.88rem;font-weight:700;color:var(--text)}
 details.tile.out{background:var(--tile-out)}
 details.tile.out[open]{background:var(--tile-out)}
-details.tile.out .tile-name,.tile-out .tile-stage,.tile-out .tile-pts{color:var(--tile-out-text)}
 details.tile.out .tile-name{color:var(--tile-out-text)}
+details.tile.out .tile-stage{color:var(--tile-out-text)}
 details.tile.out .tile-pts{color:var(--text-muted)}
 .star{font-size:0.6rem;vertical-align:1px;margin-left:2px;color:#d97706}
 .warn-flag{font-size:0.65rem;vertical-align:1px;margin-left:3px;color:var(--warn-border);cursor:help}
@@ -96,41 +96,18 @@ details.tile[open] .chevron{transform:rotate(90deg)}
   <div class="loading">Loading board…</div>
 </main>
 <script>
-const KO_PTS={GROUP:0,R32:0,R16:2,QF:5,SF:9,FINAL:14,CHAMPION:20};
+// ── A: SINGLE SCORING SOURCE ────────────────────────────────────────────────
+// scoreAndTrail returns {total, rows} where rows.reduce(pts) === total.
+// The tile face and the expanded trail both read from here — they can't drift.
 const STAGE_RANK={GROUP:0,R32:1,R16:2,QF:3,SF:4,FINAL:5,CHAMPION:6};
 
-function scoreTeam({won_group,furthest_stage}){
-  const adv=furthest_stage!=='GROUP';
-  const g=won_group?2:adv?1:0;
-  return g+(KO_PTS[furthest_stage]||0);
-}
-
-function roundLabel(won_group,fs){
-  if(fs==='GROUP')      return 'Out';
-  if(fs==='R32')        return won_group?'Group winner':'Advanced';
-  if(fs==='R16')        return 'Round of 16';
-  if(fs==='QF')         return 'Quarter-final';
-  if(fs==='SF')         return 'Semi-final';
-  if(fs==='FINAL')      return 'Runner-up';
-  if(fs==='CHAMPION')   return 'Champion';
-  return fs;
-}
-
-function stageLabelColor(fs){
-  if(fs==='GROUP')      return'#9ca3af';
-  if(fs==='R32')        return'#6b7280';
-  if(fs==='R16')        return'#2563eb';
-  if(fs==='QF')         return'#7c3aed';
-  if(fs==='SF')         return'#059669';
-  if(fs==='FINAL')      return'#dc2626';
-  if(fs==='CHAMPION')   return'#d97706';
-  return'#6b7280';
-}
-
-function buildTrail(won_group,fs){
-  const rank=STAGE_RANK[fs]||0;
+function scoreAndTrail({won_group,furthest_stage}){
+  const rank=STAGE_RANK[furthest_stage]??0;
   const rows=[];
-  if(rank===0){rows.push({label:'Eliminated in group stage',pts:0});return rows;}
+  if(rank===0){
+    rows.push({label:'Eliminated in group stage',pts:0});
+    return{total:0,rows};
+  }
   rows.push(won_group
     ?{label:'Won group',pts:2}
     :{label:'Advanced (runner-up / best 3rd)',pts:1});
@@ -139,25 +116,45 @@ function buildTrail(won_group,fs){
   if(rank>=4)rows.push({label:'Won QF → Semi-final',pts:4});
   if(rank>=5)rows.push({label:'Won SF → Final',pts:5});
   if(rank>=6)rows.push({label:'Won Final',pts:6});
-  return rows;
+  const total=rows.reduce((s,r)=>s+r.pts,0);
+  return{total,rows};
 }
 
-function phaseLabel(teams){
+// ── D: roundLabel uses eliminated to distinguish alive-in-round from out-of-round
+const ROUND_NAMES={R32:'Round of 32',R16:'Round of 16',QF:'Quarter-final',SF:'Semi-final',FINAL:'Final'};
+
+function roundLabel(eliminated,won_group,fs){
+  if(eliminated){
+    if(fs==='GROUP')    return'Out';
+    return'Out · '+(ROUND_NAMES[fs]||fs);
+  }
+  if(fs==='R32')        return won_group?'Group winner':'Advanced';
+  if(fs==='R16')        return'Round of 16';
+  if(fs==='QF')         return'Quarter-final';
+  if(fs==='SF')         return'Semi-final';
+  if(fs==='FINAL')      return'Runner-up';
+  if(fs==='CHAMPION')   return'Champion';
+  return fs;
+}
+
+function stageLabelColor(fs){
+  if(fs==='R16')        return'#2563eb';
+  if(fs==='QF')         return'#7c3aed';
+  if(fs==='SF')         return'#059669';
+  if(fs==='FINAL')      return'#dc2626';
+  if(fs==='CHAMPION')   return'#d97706';
+  return'';
+}
+
+// ── C: phase fallback (client-computed from max-team-stage; used only when
+//       results.json lacks the phase field, i.e. pre-Phase-3 data)
+function phaseFallback(teams){
   let max=0;
   for(const t of Object.values(teams)){
     const r=STAGE_RANK[t.furthest_stage]||0;
     if(r>max)max=r;
   }
   return['Group stage in progress','Group stage final · Round of 32 in progress','Round of 32 complete · Round of 16 in progress','Round of 16 complete · Quarter-finals in progress','Quarter-finals complete · Semi-finals in progress','Semi-finals complete · Final in progress','Tournament complete'][max]||'Group stage in progress';
-}
-
-function parseMismatchIds(warnings){
-  const ids=new Set();
-  for(const w of(warnings||[])){
-    const m=w.match(/team (\d+)/);
-    if(m)ids.add(m[1]);
-  }
-  return ids;
 }
 
 function computeRanks(totals){
@@ -194,7 +191,7 @@ function esc(s){
 async function render(){
   const board=document.getElementById('board');
   try{
-    const [td,rd,od]=await Promise.all([
+    const[td,rd,od]=await Promise.all([
       fetch('teams.json').then(r=>r.json()),
       fetch('results.json').then(r=>r.json()),
       fetch('overrides.json').then(r=>r.json()).catch(()=>({teams:{}})),
@@ -205,7 +202,8 @@ async function render(){
       teamRes[id]={...(teamRes[id]||{}),...ov};
     }
 
-    const mismatchIds=parseMismatchIds(rd._warnings);
+    // ── B: _mismatches is a structured id array — no regex ──────────────────
+    const mismatchIds=new Set(rd._mismatches||[]);
 
     const ownerPicks=new Map();
     for(const pick of td.teams){
@@ -218,7 +216,7 @@ async function render(){
       let total=0;
       for(const p of picks){
         const t=teamRes[String(p.team_id)]||{won_group:false,furthest_stage:'GROUP'};
-        total+=scoreTeam(t);
+        total+=scoreAndTrail(t).total;
       }
       ownerTotals.set(owner,total);
     }
@@ -230,7 +228,8 @@ async function render(){
 
     const ranks=computeRanks(ownerTotals);
 
-    document.getElementById('phase-badge').textContent=phaseLabel(teamRes);
+    // ── C: phase from results.json; phaseFallback only if absent ────────────
+    document.getElementById('phase-badge').textContent=rd.phase??phaseFallback(teamRes);
     if(rd.last_updated){
       document.getElementById('last-updated').textContent='Updated '+fmtDate(rd.last_updated);
     }
@@ -252,22 +251,27 @@ async function render(){
       for(const pick of picks){
         const tid=String(pick.team_id);
         const t=teamRes[tid]||{won_group:false,furthest_stage:'GROUP'};
-        const pts=scoreTeam(t);
-        const isOut=t.furthest_stage==='GROUP';
-        const label=roundLabel(t.won_group,t.furthest_stage);
+
+        // ── A: one call drives both total and trail ─────────────────────────
+        const{total:pts,rows}=scoreAndTrail(t);
+
+        // ── D: use eliminated field; fall back to furthest_stage===GROUP ────
+        const isOut=t.eliminated??t.furthest_stage==='GROUP';
+        const label=roundLabel(isOut,t.won_group,t.furthest_stage);
+        // eliminated tiles: no color (CSS .out rule handles muting)
         const labelColor=isOut?'':stageLabelColor(t.furthest_stage);
         const isMismatch=mismatchIds.has(tid);
-        const trail=buildTrail(t.won_group,t.furthest_stage);
 
-        const trailRows=trail.map(row=>
+        const trailRows=rows.map(row=>
           row.pts>0
             ?`<div class="trail-row"><span>${esc(row.label)}</span><span class="trail-plus">+${row.pts}</span></div>`
             :`<div class="trail-row"><span>${esc(row.label)}</span><span class="trail-nil">—</span></div>`
         ).join('');
 
-        const starHtml=t.won_group&&!isOut?`<span class="star" aria-label="Group winner">★</span>`:'';
+        const starHtml=t.won_group?`<span class="star" aria-label="Group winner">★</span>`:'';
         const warnHtml=isMismatch?`<span class="warn-flag" title="Standings vs bracket mismatch — confirm manually">⚠</span>`:'';
 
+        // ── E: fix "1 pts" → "1 pt" ─────────────────────────────────────────
         tilesHtml+=`<details class="tile${isOut?' out':''}">
 <summary>
 <div class="tile-top">
@@ -276,12 +280,12 @@ async function render(){
 </div>
 <div class="tile-footer">
 <span class="tile-stage"${labelColor?` style="color:${labelColor}"`:''}>${esc(label)}</span>
-<span class="tile-pts"${isOut?' style="color:var(--tile-out-text)"':''}>${pts}</span>
+<span class="tile-pts">${pts}</span>
 </div>
 </summary>
 <div class="tile-trail">
 ${trailRows}
-<div class="trail-total"><span>Total</span><span>${pts} pt${pts!==1?'s':'s'}</span></div>
+<div class="trail-total"><span>Total</span><span>${pts} pt${pts!==1?'s':''}</span></div>
 </div>
 </details>`;
       }

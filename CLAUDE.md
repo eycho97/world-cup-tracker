@@ -72,8 +72,12 @@ function scoreTeam({ won_group, furthest_stage }) {
 ## Data model — three JSON files
 
 - **`teams.json`** (static, authored once): the 45 picks. Keyed on numeric **`team_id`** from `/v4/competitions/WC/teams`. Names are DISPLAY-ONLY. Entry: `{ owner, team_id, name }`.
-- **`results.json`** (cron-written): `{ last_updated, teams: { <team_id>: { won_group, furthest_stage } } }`. Absent ⇒ GROUP / not won.
-- **`overrides.json`** (manual seam, ships empty): same shape as `results.json.teams`; any present field wins. Adding a Notion-backed layer later = repoint `getOverrides()` at the Notion MCP DB; no frontend/schema change.
+- **`results.json`** (cron-written): `{ last_updated, phase, teams: { <team_id>: { won_group, furthest_stage, eliminated } }, _mismatches? }`.
+  - `phase` (string): tournament phase computed from match-completion counts (NOT from max team stage). Examples: `"Group stage final · Round of 32 in progress"`, `"Round of 32 complete · Round of 16 in progress"`, `"Tournament complete"`.
+  - Per-team `eliminated` (boolean): `true` if the team lost a FINISHED group-stage match (didn't advance) or a FINISHED main-bracket KO match. `false` if still alive (won latest match / awaiting next round) or CHAMPION. Display-only; does NOT affect scoring.
+  - `_mismatches` (array of team_id strings, e.g. `["8601","1930"]`): present when the standings-derived advancer set disagrees with the R32 bracket participant set. Structured ids only — no prose strings.
+  - Absent-field rules: missing `eliminated` → treat as `furthest_stage === 'GROUP'`; missing `phase` → client falls back to max-stage heuristic; missing `_mismatches` → `[]`.
+- **`overrides.json`** (manual seam, ships empty): same shape as `results.json.teams`; any present field wins field-by-field. Adding a Notion-backed layer later = repoint `getOverrides()` at the Notion MCP DB; no frontend/schema change.
 
 **Key on `team_id`, never on name.** Names can drift; ids don't. A silent name mismatch zeroes a team forever.
 
