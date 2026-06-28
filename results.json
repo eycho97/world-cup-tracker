@@ -1,0 +1,197 @@
+{
+  "last_updated": "2026-06-28T15:34:24.388Z",
+  "teams": {
+    "758": {
+      "won_group": false,
+      "furthest_stage": "GROUP"
+    },
+    "759": {
+      "won_group": true,
+      "furthest_stage": "R32"
+    },
+    "760": {
+      "won_group": true,
+      "furthest_stage": "R32"
+    },
+    "761": {
+      "won_group": false,
+      "furthest_stage": "R32"
+    },
+    "762": {
+      "won_group": true,
+      "furthest_stage": "R32"
+    },
+    "763": {
+      "won_group": false,
+      "furthest_stage": "R32"
+    },
+    "764": {
+      "won_group": true,
+      "furthest_stage": "R32"
+    },
+    "765": {
+      "won_group": false,
+      "furthest_stage": "R32"
+    },
+    "766": {
+      "won_group": false,
+      "furthest_stage": "R32"
+    },
+    "769": {
+      "won_group": true,
+      "furthest_stage": "R32"
+    },
+    "770": {
+      "won_group": true,
+      "furthest_stage": "R32"
+    },
+    "771": {
+      "won_group": true,
+      "furthest_stage": "R32"
+    },
+    "772": {
+      "won_group": false,
+      "furthest_stage": "GROUP"
+    },
+    "773": {
+      "won_group": true,
+      "furthest_stage": "R32"
+    },
+    "774": {
+      "won_group": false,
+      "furthest_stage": "R32"
+    },
+    "778": {
+      "won_group": false,
+      "furthest_stage": "R32"
+    },
+    "779": {
+      "won_group": false,
+      "furthest_stage": "R32"
+    },
+    "783": {
+      "won_group": false,
+      "furthest_stage": "GROUP"
+    },
+    "788": {
+      "won_group": true,
+      "furthest_stage": "R32"
+    },
+    "791": {
+      "won_group": false,
+      "furthest_stage": "R32"
+    },
+    "792": {
+      "won_group": false,
+      "furthest_stage": "R32"
+    },
+    "798": {
+      "won_group": false,
+      "furthest_stage": "GROUP"
+    },
+    "799": {
+      "won_group": false,
+      "furthest_stage": "R32"
+    },
+    "801": {
+      "won_group": false,
+      "furthest_stage": "GROUP"
+    },
+    "802": {
+      "won_group": false,
+      "furthest_stage": "GROUP"
+    },
+    "803": {
+      "won_group": false,
+      "furthest_stage": "GROUP"
+    },
+    "804": {
+      "won_group": false,
+      "furthest_stage": "R32"
+    },
+    "805": {
+      "won_group": true,
+      "furthest_stage": "R32"
+    },
+    "815": {
+      "won_group": false,
+      "furthest_stage": "R32"
+    },
+    "816": {
+      "won_group": false,
+      "furthest_stage": "R32"
+    },
+    "818": {
+      "won_group": true,
+      "furthest_stage": "R32"
+    },
+    "825": {
+      "won_group": false,
+      "furthest_stage": "R32"
+    },
+    "828": {
+      "won_group": false,
+      "furthest_stage": "R32"
+    },
+    "836": {
+      "won_group": false,
+      "furthest_stage": "GROUP"
+    },
+    "840": {
+      "won_group": false,
+      "furthest_stage": "GROUP"
+    },
+    "1060": {
+      "won_group": false,
+      "furthest_stage": "R32"
+    },
+    "1836": {
+      "won_group": false,
+      "furthest_stage": "GROUP"
+    },
+    "1930": {
+      "won_group": false,
+      "furthest_stage": "R32"
+    },
+    "1934": {
+      "won_group": false,
+      "furthest_stage": "R32"
+    },
+    "1935": {
+      "won_group": false,
+      "furthest_stage": "R32"
+    },
+    "8030": {
+      "won_group": false,
+      "furthest_stage": "GROUP"
+    },
+    "8049": {
+      "won_group": false,
+      "furthest_stage": "GROUP"
+    },
+    "8062": {
+      "won_group": false,
+      "furthest_stage": "GROUP"
+    },
+    "8070": {
+      "won_group": false,
+      "furthest_stage": "GROUP"
+    },
+    "8601": {
+      "won_group": true,
+      "furthest_stage": "R32"
+    },
+    "8872": {
+      "won_group": false,
+      "furthest_stage": "R32"
+    },
+    "8873": {
+      "won_group": false,
+      "furthest_stage": "GROUP"
+    },
+    "9460": {
+      "won_group": false,
+      "furthest_stage": "GROUP"
+    }
+  }
+}
