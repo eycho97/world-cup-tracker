@@ -1,5 +1,5 @@
 {
-  "last_updated": "2026-06-28T16:42:54.804Z",
+  "last_updated": "2026-06-28T21:34:56.179Z",
   "teams": {
     "758": {
       "won_group": false,
@@ -74,7 +74,7 @@
     "774": {
       "won_group": false,
       "furthest_stage": "R32",
-      "eliminated": false
+      "eliminated": true
     },
     "778": {
       "won_group": false,
@@ -163,7 +163,7 @@
     },
     "828": {
       "won_group": false,
-      "furthest_stage": "R32",
+      "furthest_stage": "R16",
       "eliminated": false
     },
     "836": {
@@ -242,5 +242,5 @@
       "eliminated": true
     }
   },
-  "phase": "Group stage final · Round of 32 in progress"
+  "phase": "Round of 32 in progress"
 }
