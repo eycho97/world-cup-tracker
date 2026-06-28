@@ -106,6 +106,7 @@ details.tile[open] .chevron{transform:rotate(90deg)}
 <script>
 // ── Scoring (single source — scoreAndTrail drives both tile total and trail rows) ──
 const STAGE_RANK={GROUP:0,R32:1,R16:2,QF:3,SF:4,FINAL:5,CHAMPION:6};
+const FLAGS={758:'🇺🇾',759:'🇩🇪',760:'🇪🇸',761:'🇵🇾',762:'🇦🇷',763:'🇬🇭',764:'🇧🇷',765:'🇵🇹',766:'🇯🇵',769:'🇲🇽',770:'🏴󠁧󠁢󠁥󠁮󠁧󠁿',771:'🇺🇸',772:'🇰🇷',773:'🇫🇷',774:'🇿🇦',778:'🇩🇿',779:'🇦🇺',783:'🇳🇿',788:'🇨🇭',791:'🇪🇨',792:'🇸🇪',798:'🇨🇿',799:'🇭🇷',801:'🇸🇦',802:'🇹🇳',803:'🇹🇷',804:'🇸🇳',805:'🇧🇪',815:'🇲🇦',816:'🇦🇹',818:'🇨🇴',825:'🇪🇬',828:'🇨🇦',836:'🇭🇹',840:'🇮🇷',1060:'🇧🇦',1836:'🇵🇦',1930:'🇨🇻',1934:'🇨🇩',1935:'🇨🇮',8030:'🇶🇦',8049:'🇯🇴',8062:'🇮🇶',8070:'🇺🇿',8601:'🇳🇱',8872:'🇳🇴',8873:'🏴󠁧󠁢󠁳󠁣󠁴󠁿',9460:'🇨🇼'};
 
 function scoreAndTrail({won_group,furthest_stage}){
   const rank=STAGE_RANK[furthest_stage]??0;
@@ -262,7 +263,7 @@ function buildBoard(td,rd,od){
       tilesHtml+=`<details class="tile${isOut?' out':''}" data-team-id="${tid}">
 <summary>
 <div class="tile-top">
-<div class="tile-name">${esc(pick.name)}${starHtml}${warnHtml}</div>
+<div class="tile-name">${FLAGS[pick.team_id]?FLAGS[pick.team_id]+' ':''}${esc(pick.name)}${starHtml}${warnHtml}</div>
 <span class="chevron">›</span>
 </div>
 <div class="tile-footer">

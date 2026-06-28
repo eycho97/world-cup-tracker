@@ -117,6 +117,7 @@ const OWNER_COLORS = {
   'WILL (DAD) 👴🏻':  '#CC3311',
 };
 const NEUTRAL = '#888888';
+const FLAGS={758:'🇺🇾',759:'🇩🇪',760:'🇪🇸',761:'🇵🇾',762:'🇦🇷',763:'🇬🇭',764:'🇧🇷',765:'🇵🇹',766:'🇯🇵',769:'🇲🇽',770:'🏴󠁧󠁢󠁥󠁮󠁧󠁿',771:'🇺🇸',772:'🇰🇷',773:'🇫🇷',774:'🇿🇦',778:'🇩🇿',779:'🇦🇺',783:'🇳🇿',788:'🇨🇭',791:'🇪🇨',792:'🇸🇪',798:'🇨🇿',799:'🇭🇷',801:'🇸🇦',802:'🇹🇳',803:'🇹🇷',804:'🇸🇳',805:'🇧🇪',815:'🇲🇦',816:'🇦🇹',818:'🇨🇴',825:'🇪🇬',828:'🇨🇦',836:'🇭🇹',840:'🇮🇷',1060:'🇧🇦',1836:'🇵🇦',1930:'🇨🇻',1934:'🇨🇩',1935:'🇨🇮',8030:'🇶🇦',8049:'🇯🇴',8062:'🇮🇶',8070:'🇺🇿',8601:'🇳🇱',8872:'🇳🇴',8873:'🏴󠁧󠁢󠁳󠁣󠁴󠁿',9460:'🇨🇼'};
 
 // ── Scoring ───────────────────────────────────────────────────────────────────
 const STAGE_RANK={GROUP:0,R32:1,R16:2,QF:3,SF:4,FINAL:5,CHAMPION:6};
@@ -170,7 +171,8 @@ function resolveTeam(id, teamById){
 function teamRow(team, isWinner, hasResult, fromSlot, tabMode){
   const cls = hasResult ? (isWinner?'winner':'loser') : team ? '' : 'tbd';
   const dot  = team ? `<span class="owner-dot" style="background:${team.color}"></span>` : `<span class="owner-dot" style="background:${NEUTRAL}"></span>`;
-  const name = team ? esc(team.name) : `W/M${fromSlot}`;
+  const flag = team ? (FLAGS[team.id] ?? '') : '';
+  const name = team ? `${flag}${flag?' ':''}${esc(team.name)}` : `W/M${fromSlot}`;
   const win  = tabMode && isWinner && hasResult ? ` <span class="win-badge">✓</span>` : '';
   const rowClass = tabMode ? 'tab-team' : 'team';
   return `<div class="${rowClass} ${cls}">${dot}<span class="team-name">${name}${win}</span></div>`;
