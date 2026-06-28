@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>WC 2026 Bracket · $125</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#f0f2f5;--card:#fff;--card-border:rgba(0,0,0,0.07);
+  --text:#111827;--text-sub:#6b7280;--text-muted:#9ca3af;
+  --divider:#e5e7eb;--connector:#d1d5db;
+  --hdr:#0f172a;--hdr-text:#f8fafc;--hdr-sub:#94a3b8;
+  --tile-loser:#f9fafb;--loser-text:#adb5bd;
+  --tbd-bg:#f3f4f6;--tbd-text:#9ca3af;
+  --tab-active:#111827;--tab-bg:#f3f4f6;
+}
+@media(prefers-color-scheme:dark){:root{
+  --bg:#0f172a;--card:#1e293b;--card-border:rgba(255,255,255,0.07);
+  --text:#f1f5f9;--text-sub:#94a3b8;--text-muted:#64748b;
+  --divider:#334155;--connector:#475569;
+  --hdr:#020617;--hdr-text:#f1f5f9;--hdr-sub:#64748b;
+  --tile-loser:#172033;--loser-text:#4b5563;
+  --tbd-bg:#1e293b;--tbd-text:#64748b;
+  --tab-active:#f1f5f9;--tab-bg:#1e293b;
+}}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
+.page-hdr{background:var(--hdr);color:var(--hdr-text);padding:14px 16px;display:flex;align-items:center;gap:12px}
+.back-link{color:var(--hdr-sub);text-decoration:none;font-size:0.85rem}
+.back-link:hover{color:var(--hdr-text)}
+.hdr-title{font-size:1.1rem;font-weight:700;flex:1}
+
+/* Legend */
+.legend{max-width:880px;margin:12px auto;padding:0 12px;display:flex;flex-wrap:wrap;gap:6px}
+.leg-row{display:flex;align-items:center;gap:7px;background:var(--card);border:0.5px solid var(--card-border);border-radius:8px;padding:6px 10px;font-size:0.78rem;min-width:160px;flex:1}
+.leg-rank{font-weight:700;color:var(--text-sub);width:16px}
+.leg-dot{width:9px;height:9px;border-radius:50%;flex-shrink:0}
+.leg-name{flex:1;font-weight:600}
+.leg-pts{font-weight:700;color:var(--text-sub)}
+
+/* View toggle */
+.view-controls{max-width:880px;margin:10px auto 0;padding:0 12px;display:flex;align-items:center;gap:8px;font-size:0.78rem}
+.toggle-grp{display:flex;border:0.5px solid var(--divider);border-radius:6px;overflow:hidden}
+.toggle-btn{background:var(--tab-bg);color:var(--text-sub);border:none;padding:5px 12px;cursor:pointer;font-size:0.75rem;font-family:inherit;transition:background 0.1s}
+.toggle-btn.active{background:var(--tab-active);color:var(--bg);font-weight:600}
+.view-label{color:var(--text-muted);font-size:0.72rem}
+
+/* Round labels bar (tree mode) */
+.round-label-bar{display:flex;max-width:880px;margin:8px auto 0;padding:0 12px;overflow-x:auto}
+.rl{font-size:0.68rem;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;color:var(--text-muted);text-align:center;flex-shrink:0}
+
+/* Bracket scroll container */
+.bracket-outer{max-width:880px;margin:0 auto;padding:0 12px 24px;overflow-x:auto}
+.bracket-wrap{position:relative;height:960px;min-width:896px}
+.bracket-wrap svg.connectors{position:absolute;inset:0;width:100%;height:100%;overflow:visible;pointer-events:none}
+
+/* Match card */
+.match-card{position:absolute;width:160px;background:var(--card);border:0.5px solid var(--card-border);border-radius:5px;overflow:hidden}
+.team{display:flex;align-items:center;gap:5px;padding:4px 7px;line-height:1.2;min-height:26px}
+.team+.team{border-top:0.5px solid var(--divider)}
+.owner-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
+.team-name{font-size:0.72rem;font-weight:500;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.team.winner .team-name{font-weight:700}
+.team.loser{background:var(--tile-loser)}
+.team.loser .team-name{color:var(--loser-text)}
+.team.tbd{background:var(--tbd-bg)}
+.team.tbd .team-name{color:var(--tbd-text);font-style:italic;font-size:0.68rem}
+.match-label{position:absolute;top:0;right:3px;font-size:0.55rem;color:var(--text-muted);line-height:1;padding-top:1px}
+
+/* Round-tabs view */
+.tabs-view{max-width:600px;margin:0 auto;padding:0 12px 24px}
+.round-tabs{display:flex;border-bottom:1px solid var(--divider);margin-bottom:12px;gap:0}
+.round-tab{flex:1;padding:8px 0;text-align:center;font-size:0.78rem;font-weight:500;color:var(--text-sub);cursor:pointer;border-bottom:2px solid transparent;background:none;border-top:none;border-left:none;border-right:none;font-family:inherit}
+.round-tab.active{color:var(--text);border-bottom-color:var(--text)}
+.tab-pane{display:none}
+.tab-pane.active{display:flex;flex-direction:column;gap:8px}
+.tab-match{background:var(--card);border:0.5px solid var(--card-border);border-radius:8px;overflow:hidden}
+.tab-match-hdr{font-size:0.65rem;color:var(--text-muted);padding:4px 10px 2px;border-bottom:0.5px solid var(--divider)}
+.tab-team{display:flex;align-items:center;gap:8px;padding:8px 10px;min-height:36px}
+.tab-team+.tab-team{border-top:0.5px solid var(--divider)}
+.tab-team .owner-dot{width:9px;height:9px;border-radius:50%;flex-shrink:0}
+.tab-team .team-name{font-size:0.85rem;font-weight:500;flex:1}
+.tab-team.winner .team-name{font-weight:700}
+.tab-team.loser{background:var(--tile-loser)}
+.tab-team.loser .team-name{color:var(--loser-text)}
+.tab-team.tbd{background:var(--tbd-bg)}
+.tab-team.tbd .team-name{color:var(--tbd-text);font-style:italic}
+.win-badge{font-size:0.65rem;color:#059669;font-weight:700}
+
+.loading{text-align:center;color:var(--text-sub);padding:40px;font-size:0.9rem}
+</style>
+</head>
+<body>
+<header class="page-hdr">
+  <a href="index.html" class="back-link">← Leaderboard</a>
+  <div class="hdr-title">⚽ WC 2026 Bracket</div>
+</header>
+<div id="legend" class="legend"></div>
+<div class="view-controls">
+  <div class="toggle-grp">
+    <button class="toggle-btn active" id="btn-tree">Full bracket</button>
+    <button class="toggle-btn"        id="btn-tabs">By round</button>
+  </div>
+  <span class="view-label" id="view-note"></span>
+</div>
+<div id="round-label-bar" class="round-label-bar" style="display:none"></div>
+<div id="tree-view"><div class="loading">Loading bracket…</div></div>
+<div id="tabs-view" style="display:none"><div class="loading">Loading…</div></div>
+
+<script>
+// ── Owner colors (colorblind-friendly) ───────────────────────────────────────
+const OWNER_COLORS = {
+  'ED CHO 🇰🇷':     '#0077BB',
+  'DYL PICKLE 🥒':  '#228833',
+  'IMAN IS #1 🇮🇷':  '#EE7733',
+  'PAT (JR) 🫚':    '#AA3377',
+  'WILL (DAD) 👴🏻':  '#CC3311',
+};
+const NEUTRAL = '#888888';
+
+// ── Scoring ───────────────────────────────────────────────────────────────────
+const STAGE_RANK={GROUP:0,R32:1,R16:2,QF:3,SF:4,FINAL:5,CHAMPION:6};
+function scoreTeam({won_group,furthest_stage}){
+  const adv=furthest_stage!=='GROUP';
+  const g=won_group?2:adv?1:0;
+  const KO={GROUP:0,R32:0,R16:2,QF:5,SF:9,FINAL:14,CHAMPION:20};
+  return g+(KO[furthest_stage]||0);
+}
+
+// ── Bracket layout constants ──────────────────────────────────────────────────
+const MATCH_W = 160, MATCH_H = 52, UNIT_H = 60, TOTAL_H = 960;
+const GAP = 24;
+const ROUND_X = { R32: 0, R16: MATCH_W+GAP, R16q: 0, QF: 2*(MATCH_W+GAP), SF: 3*(MATCH_W+GAP), FINAL: 4*(MATCH_W+GAP) };
+// Actually compute from rounds array:
+const ROUNDS = ['R32','R16','QF','SF','FINAL'];
+const COL_X = {};
+ROUNDS.forEach((r,i) => COL_X[r] = i*(MATCH_W+GAP));
+
+// R32 bracket order (top→bottom): matches in correct pos order
+const R32_ORDER = [74,77,73,75, 83,84,81,82, 76,78,79,80, 86,88,85,87];
+
+function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+
+// ── Compute vertical positions from skeleton ──────────────────────────────────
+function computePositions(skeleton){
+  const posY = {};
+  for(let i=0;i<R32_ORDER.length;i++) posY[R32_ORDER[i]] = (i+0.5)*UNIT_H;
+  // all non-R32 slots: average of feeder positions
+  const order = ['R16','QF','SF','FINAL'];
+  for(const round of order){
+    const slots = Object.values(skeleton.slots).filter(s=>s.round===round).sort((a,b)=>a.pos-b.pos);
+    for(const sk of slots){
+      posY[sk.match] = (posY[sk.fed_by[0]] + posY[sk.fed_by[1]]) / 2;
+    }
+  }
+  return posY;
+}
+
+// ── Resolve team info ─────────────────────────────────────────────────────────
+function resolveTeam(id, teamById){
+  if(!id) return null;
+  const t = teamById[id];
+  if(t) return { id, name:t.name, owner:t.owner, color:OWNER_COLORS[t.owner]??NEUTRAL };
+  // Undrafted — not in teams.json
+  const NAMES = {1930:'Cape Verde Islands',9460:'Curaçao',8062:'Iraq'};
+  return { id, name: NAMES[id]??`Team ${id}`, owner:null, color:NEUTRAL };
+}
+
+// ── Match card HTML ───────────────────────────────────────────────────────────
+function teamRow(team, isWinner, hasResult, fromSlot, tabMode){
+  const cls = hasResult ? (isWinner?'winner':'loser') : team ? '' : 'tbd';
+  const dot  = team ? `<span class="owner-dot" style="background:${team.color}"></span>` : `<span class="owner-dot" style="background:${NEUTRAL}"></span>`;
+  const name = team ? esc(team.name) : `W/M${fromSlot}`;
+  const win  = tabMode && isWinner && hasResult ? ` <span class="win-badge">✓</span>` : '';
+  const rowClass = tabMode ? 'tab-team' : 'team';
+  return `<div class="${rowClass} ${cls}">${dot}<span class="team-name">${name}${win}</span></div>`;
+}
+
+function matchCardHtml(slot, matchId, posY, tabMode){
+  const { home, away, winner_id, home_from, away_from } = slot;
+  const hasResult = !!winner_id;
+  const h = teamRow(home, home && winner_id===home.id, hasResult, home_from, tabMode);
+  const a = teamRow(away, away && winner_id===away.id, hasResult, away_from, tabMode);
+  if(tabMode){
+    return `<div class="tab-match">
+<div class="tab-match-hdr">M${matchId}</div>
+${h}${a}
+</div>`;
+  }
+  return `<div class="match-card">
+<span class="match-label">M${matchId}</span>
+${h}${a}
+</div>`;
+}
+
+// ── Tree renderer ─────────────────────────────────────────────────────────────
+function renderTree(slots, skeleton, posY){
+  const svgLines = [];
+  let cardsHtml  = '';
+
+  for(const [id, sk] of Object.entries(skeleton.slots)){
+    const slot = slots[id];
+    const x = COL_X[sk.round];
+    const y = posY[Number(id)];
+    const top = Math.round(y - MATCH_H/2);
+
+    // Place card
+    cardsHtml += `<div style="position:absolute;left:${x}px;top:${top}px;width:${MATCH_W}px;">${matchCardHtml(slot, id, posY, false)}</div>`;
+
+    // Draw connector lines for non-R32 slots (which have fed_by)
+    if(sk.fed_by){
+      const f0y = posY[sk.fed_by[0]];
+      const f1y = posY[sk.fed_by[1]];
+      const xRight = COL_X[skeleton.slots[String(sk.fed_by[0])].round] + MATCH_W;
+      const xJoin  = xRight + Math.round(GAP/2);
+      const mid    = (f0y + f1y) / 2;
+      const stroke = 'stroke="var(--connector)" stroke-width="1" fill="none"';
+      // C-bracket: top horizontal, vertical, bottom horizontal
+      svgLines.push(`<polyline points="${xRight},${f0y} ${xJoin},${f0y} ${xJoin},${f1y} ${xRight},${f1y}" ${stroke}/>`);
+      // Horizontal exit to this slot
+      svgLines.push(`<line x1="${xJoin}" y1="${mid}" x2="${x}" y2="${mid}" ${stroke}/>`);
+    }
+  }
+
+  return `<div class="bracket-outer">
+<div class="bracket-wrap">
+<svg class="connectors">${svgLines.join('')}</svg>
+${cardsHtml}
+</div>
+</div>`;
+}
+
+// ── Round-tabs renderer ───────────────────────────────────────────────────────
+const ROUND_LABELS = {R32:'R32',R16:'R16',QF:'QF',SF:'SF',FINAL:'Final'};
+const ROUND_ORDER_TABS = ['R32','R16','QF','SF','FINAL'];
+const TAB_MATCH_ORDER = {
+  R32:   [74,77,73,75,83,84,81,82,76,78,79,80,86,88,85,87],
+  R16:   [89,90,93,94,91,92,95,96],
+  QF:    [97,98,99,100],
+  SF:    [101,102],
+  FINAL: [104],
+};
+
+function renderTabs(slots, skeleton){
+  const tabs = ROUND_ORDER_TABS.map((r,i)=>
+    `<button class="round-tab${i===0?' active':''}" data-round="${r}">${ROUND_LABELS[r]}</button>`
+  ).join('');
+
+  const panes = ROUND_ORDER_TABS.map((r,i)=>{
+    const matchList = (TAB_MATCH_ORDER[r]||[]).map(id=>matchCardHtml(slots[String(id)], id, null, true)).join('');
+    return `<div class="tab-pane${i===0?' active':''}" id="pane-${r}">${matchList}</div>`;
+  }).join('');
+
+  return `<div class="tabs-view">
+<div class="round-tabs">${tabs}</div>
+${panes}
+</div>`;
+}
+
+// ── Legend renderer ───────────────────────────────────────────────────────────
+function renderLegend(teamsData, resultsData){
+  const ownerTotals = {};
+  const ownerOf = {};
+  for(const pick of teamsData.teams){
+    ownerOf[pick.team_id] = pick.owner;
+    const t = resultsData.teams?.[String(pick.team_id)] ?? {won_group:false,furthest_stage:'GROUP'};
+    ownerTotals[pick.owner] = (ownerTotals[pick.owner]||0) + scoreTeam(t);
+  }
+  const sorted = Object.entries(ownerTotals).sort(([,a],[,b])=>b-a);
+  // compute ranks
+  const ranks={};let i=0;
+  while(i<sorted.length){
+    const pts=sorted[i][1];let j=i;
+    while(j<sorted.length&&sorted[j][1]===pts)j++;
+    const rk=i+1;for(let k=i;k<j;k++)ranks[sorted[k][0]]=rk;i=j;
+  }
+  return sorted.map(([owner,pts])=>`<div class="leg-row">
+<span class="leg-rank">${ranks[owner]}</span>
+<span class="leg-dot" style="background:${OWNER_COLORS[owner]??NEUTRAL}"></span>
+<span class="leg-name">${esc(owner)}</span>
+<span class="leg-pts">${pts} pts</span>
+</div>`).join('');
+}
+
+// ── Main ──────────────────────────────────────────────────────────────────────
+(async()=>{
+  const ts=Date.now();
+  try{
+    const[skData,bData,tData,rData]=await Promise.all([
+      fetch(`bracket-skeleton.json?t=${ts}`,{cache:'no-store'}).then(r=>r.json()),
+      fetch(`bracket.json?t=${ts}`,{cache:'no-store'}).then(r=>r.json()),
+      fetch(`teams.json?t=${ts}`,{cache:'no-store'}).then(r=>r.json()),
+      fetch(`results.json?t=${ts}`,{cache:'no-store'}).then(r=>r.json()),
+    ]);
+
+    // Build teamById lookup
+    const teamById={};
+    for(const pick of tData.teams)
+      teamById[pick.team_id]={name:pick.name,owner:pick.owner};
+
+    // Compute vertical positions
+    const posY = computePositions(skData);
+
+    // Build slot data for rendering
+    const slots={};
+    for(const[id,sk]of Object.entries(skData.slots)){
+      const b=bData.slots[id]||{};
+      slots[id]={
+        home:    resolveTeam(b.home_id, teamById),
+        away:    resolveTeam(b.away_id, teamById),
+        winner_id: b.winner_id??null,
+        home_from: sk.fed_by?.[0]??null,
+        away_from: sk.fed_by?.[1]??null,
+      };
+    }
+
+    // Legend
+    document.getElementById('legend').innerHTML=renderLegend(tData,rData);
+
+    // Tree and tabs HTML
+    const treeHtml=renderTree(slots,skData,posY);
+    const tabsHtml=renderTabs(slots,skData);
+
+    document.getElementById('tree-view').innerHTML=treeHtml;
+    document.getElementById('tabs-view').innerHTML=tabsHtml;
+
+    // Round label bar
+    const rlBar=document.getElementById('round-label-bar');
+    const colW=MATCH_W+GAP;
+    rlBar.innerHTML=ROUNDS.map(r=>`<div class="rl" style="width:${MATCH_W}px;margin-right:${GAP}px">${r}</div>`).join('')+'<div class="rl" style="width:160px">Final</div>';
+
+    // Tab switching
+    document.getElementById('tabs-view').addEventListener('click',e=>{
+      const btn=e.target.closest('.round-tab');
+      if(!btn)return;
+      document.querySelectorAll('#tabs-view .round-tab').forEach(b=>b.classList.remove('active'));
+      document.querySelectorAll('#tabs-view .tab-pane').forEach(p=>p.classList.remove('active'));
+      btn.classList.add('active');
+      document.getElementById('pane-'+btn.dataset.round)?.classList.add('active');
+    });
+
+    // View toggle
+    const treeEl=document.getElementById('tree-view');
+    const tabsEl=document.getElementById('tabs-view');
+    const rlBarEl=document.getElementById('round-label-bar');
+    const btnTree=document.getElementById('btn-tree');
+    const btnTabs=document.getElementById('btn-tabs');
+    const note=document.getElementById('view-note');
+
+    function showTree(){
+      treeEl.style.display=''; tabsEl.style.display='none';
+      rlBarEl.style.display=''; btnTree.classList.add('active'); btnTabs.classList.remove('active');
+      note.textContent='Scroll right on narrow screens';
+    }
+    function showTabs(){
+      treeEl.style.display='none'; tabsEl.style.display='';
+      rlBarEl.style.display='none'; btnTabs.classList.add('active'); btnTree.classList.remove('active');
+      note.textContent='';
+    }
+    btnTree.onclick=showTree;
+    btnTabs.onclick=showTabs;
+
+    // Default by viewport
+    if(window.innerWidth<768) showTabs(); else showTree();
+
+  }catch(e){
+    const msg=`<div class="loading">Error loading bracket: ${esc(e.message)}</div>`;
+    document.getElementById('tree-view').innerHTML=msg;
+    console.error(e);
+  }
+})();
+</script>
+</body>
+</html>
