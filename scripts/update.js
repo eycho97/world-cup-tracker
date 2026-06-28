@@ -7,13 +7,16 @@ const fs         = require('fs');
 const path       = require('path');
 const { execSync } = require('child_process');
 const { derive, STAGE_RANK } = require('../logic/derive.js');
+const { buildBracket }       = require('../logic/bracket.js');
 
 const API_KEY = process.env.FOOTBALL_DATA_API_KEY;
 if (!API_KEY) { console.error('Missing FOOTBALL_DATA_API_KEY env var'); process.exit(1); }
 
-const ROOT    = path.join(__dirname, '..');
-const OUT     = path.join(ROOT, 'results.json');
-const OVR     = path.join(ROOT, 'overrides.json');
+const ROOT     = path.join(__dirname, '..');
+const OUT      = path.join(ROOT, 'results.json');
+const BOUT     = path.join(ROOT, 'bracket.json');
+const OVR      = path.join(ROOT, 'overrides.json');
+const SKELETON = path.join(ROOT, 'bracket-skeleton.json');
 const BASE    = 'api.football-data.org';
 
 // ── HTTP + throttle ───────────────────────────────────────────────────────────
@@ -207,18 +210,36 @@ function contentEquals(a, b) {
   smokeGate(final, matches);
   console.log('  Smoke gate passed ✓');
 
-  // ── Skip if nothing meaningful changed ────────────────────────────────────
-  let existing = null;
-  try { existing = JSON.parse(fs.readFileSync(OUT, 'utf8')); } catch {}
+  // ── Build bracket ──────────────────────────────────────────────────────────
+  const skeleton = JSON.parse(fs.readFileSync(SKELETON, 'utf8'));
+  const bracket  = buildBracket(skeleton, matches);
+  bracket.last_updated = final.last_updated;  // keep timestamps in sync
+  if (bracket._mismatches?.length)
+    console.log(`\nBracket guardrail:\n  ${bracket._mismatches.join('\n  ')}`);
 
-  if (contentEquals(existing, final)) {
+  // ── Skip if nothing meaningful changed ────────────────────────────────────
+  let existingResults = null;
+  try { existingResults = JSON.parse(fs.readFileSync(OUT,  'utf8')); } catch {}
+  let existingBracket = null;
+  try { existingBracket = JSON.parse(fs.readFileSync(BOUT, 'utf8')); } catch {}
+
+  const resultsChanged = !contentEquals(existingResults, final);
+  const bracketChanged = !contentEquals(existingBracket, bracket);
+
+  if (!resultsChanged && !bracketChanged) {
     console.log('\nNo meaningful changes — skipping write and commit.');
     process.exit(0);
   }
 
   // ── Write ──────────────────────────────────────────────────────────────────
-  fs.writeFileSync(OUT, JSON.stringify(final, null, 2));
-  console.log(`\nWrote ${OUT}`);
+  if (resultsChanged) {
+    fs.writeFileSync(OUT, JSON.stringify(final, null, 2));
+    console.log(`\nWrote ${OUT}`);
+  }
+  if (bracketChanged) {
+    fs.writeFileSync(BOUT, JSON.stringify(bracket, null, 2));
+    console.log(`Wrote ${BOUT}`);
+  }
   console.log(`last_updated : ${final.last_updated}`);
 
   // Summary stats
@@ -230,7 +251,7 @@ function contentEquals(a, b) {
 
   // ── Commit + push ──────────────────────────────────────────────────────────
   try {
-    execSync('git add results.json', { cwd: ROOT, stdio: 'inherit' });
+    execSync('git add results.json bracket.json', { cwd: ROOT, stdio: 'inherit' });
     execSync(
       `git commit -m "chore: update results ${final.last_updated}"`,
       { cwd: ROOT, stdio: 'inherit' }
