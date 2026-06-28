@@ -1,0 +1,160 @@
+{
+  "last_updated": "2026-06-28T22:27:58.663Z",
+  "slots": {
+    "73": {
+      "home_id": 774,
+      "away_id": 828,
+      "winner_id": 828
+    },
+    "74": {
+      "home_id": 759,
+      "away_id": 761,
+      "winner_id": null
+    },
+    "75": {
+      "home_id": 8601,
+      "away_id": 815,
+      "winner_id": null
+    },
+    "76": {
+      "home_id": 764,
+      "away_id": 766,
+      "winner_id": null
+    },
+    "77": {
+      "home_id": 773,
+      "away_id": 792,
+      "winner_id": null
+    },
+    "78": {
+      "home_id": 1935,
+      "away_id": 8872,
+      "winner_id": null
+    },
+    "79": {
+      "home_id": 769,
+      "away_id": 791,
+      "winner_id": null
+    },
+    "80": {
+      "home_id": 770,
+      "away_id": 1934,
+      "winner_id": null
+    },
+    "81": {
+      "home_id": 771,
+      "away_id": 1060,
+      "winner_id": null
+    },
+    "82": {
+      "home_id": 805,
+      "away_id": 804,
+      "winner_id": null
+    },
+    "83": {
+      "home_id": 765,
+      "away_id": 799,
+      "winner_id": null
+    },
+    "84": {
+      "home_id": 760,
+      "away_id": 816,
+      "winner_id": null
+    },
+    "85": {
+      "home_id": 788,
+      "away_id": 778,
+      "winner_id": null
+    },
+    "86": {
+      "home_id": 762,
+      "away_id": 1930,
+      "winner_id": null
+    },
+    "87": {
+      "home_id": 818,
+      "away_id": 763,
+      "winner_id": null
+    },
+    "88": {
+      "home_id": 779,
+      "away_id": 825,
+      "winner_id": null
+    },
+    "89": {
+      "home_id": null,
+      "away_id": null,
+      "winner_id": null
+    },
+    "90": {
+      "home_id": 828,
+      "away_id": null,
+      "winner_id": null
+    },
+    "91": {
+      "home_id": null,
+      "away_id": null,
+      "winner_id": null
+    },
+    "92": {
+      "home_id": null,
+      "away_id": null,
+      "winner_id": null
+    },
+    "93": {
+      "home_id": null,
+      "away_id": null,
+      "winner_id": null
+    },
+    "94": {
+      "home_id": null,
+      "away_id": null,
+      "winner_id": null
+    },
+    "95": {
+      "home_id": null,
+      "away_id": null,
+      "winner_id": null
+    },
+    "96": {
+      "home_id": null,
+      "away_id": null,
+      "winner_id": null
+    },
+    "97": {
+      "home_id": null,
+      "away_id": null,
+      "winner_id": null
+    },
+    "98": {
+      "home_id": null,
+      "away_id": null,
+      "winner_id": null
+    },
+    "99": {
+      "home_id": null,
+      "away_id": null,
+      "winner_id": null
+    },
+    "100": {
+      "home_id": null,
+      "away_id": null,
+      "winner_id": null
+    },
+    "101": {
+      "home_id": null,
+      "away_id": null,
+      "winner_id": null
+    },
+    "102": {
+      "home_id": null,
+      "away_id": null,
+      "winner_id": null
+    },
+    "104": {
+      "home_id": null,
+      "away_id": null,
+      "winner_id": null
+    }
+  }
+}
