@@ -1,5 +1,5 @@
 {
-  "last_updated": "2026-06-30T06:22:54.142Z",
+  "last_updated": "2026-06-30T19:05:32.338Z",
   "slots": {
     "73": {
       "home_id": 774,
@@ -29,7 +29,7 @@
     "78": {
       "home_id": 1935,
       "away_id": 8872,
-      "winner_id": null
+      "winner_id": 8872
     },
     "79": {
       "home_id": 769,
@@ -93,7 +93,7 @@
     },
     "91": {
       "home_id": 764,
-      "away_id": null,
+      "away_id": 8872,
       "winner_id": null
     },
     "92": {
