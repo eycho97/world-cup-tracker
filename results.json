@@ -1,5 +1,5 @@
 {
-  "last_updated": "2026-07-01T06:45:08.179Z",
+  "last_updated": "2026-07-01T18:14:31.982Z",
   "teams": {
     "758": {
       "won_group": false,
@@ -53,7 +53,7 @@
     },
     "770": {
       "won_group": true,
-      "furthest_stage": "R32",
+      "furthest_stage": "R16",
       "eliminated": false
     },
     "771": {
@@ -194,7 +194,7 @@
     "1934": {
       "won_group": false,
       "furthest_stage": "R32",
-      "eliminated": false
+      "eliminated": true
     },
     "1935": {
       "won_group": false,
