@@ -1,5 +1,5 @@
 {
-  "last_updated": "2026-07-08T06:37:40.298Z",
+  "last_updated": "2026-07-09T22:53:41.289Z",
   "teams": {
     "758": {
       "won_group": false,
@@ -68,7 +68,7 @@
     },
     "773": {
       "won_group": true,
-      "furthest_stage": "QF",
+      "furthest_stage": "SF",
       "eliminated": false
     },
     "774": {
@@ -144,7 +144,7 @@
     "815": {
       "won_group": false,
       "furthest_stage": "QF",
-      "eliminated": false
+      "eliminated": true
     },
     "816": {
       "won_group": false,
@@ -242,5 +242,5 @@
       "eliminated": true
     }
   },
-  "phase": "Round of 16 complete · Quarter-finals in progress"
+  "phase": "Quarter-finals in progress"
 }
