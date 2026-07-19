@@ -1,5 +1,5 @@
 {
-  "last_updated": "2026-07-15T21:45:52.006Z",
+  "last_updated": "2026-07-19T22:31:52.915Z",
   "teams": {
     "758": {
       "won_group": false,
@@ -13,7 +13,7 @@
     },
     "760": {
       "won_group": true,
-      "furthest_stage": "FINAL",
+      "furthest_stage": "CHAMPION",
       "eliminated": false
     },
     "761": {
@@ -24,7 +24,7 @@
     "762": {
       "won_group": true,
       "furthest_stage": "FINAL",
-      "eliminated": false
+      "eliminated": true
     },
     "763": {
       "won_group": false,
@@ -242,5 +242,5 @@
       "eliminated": true
     }
   },
-  "phase": "Semi-finals complete · Final in progress"
+  "phase": "Tournament complete"
 }
